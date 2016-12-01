@@ -1,5 +1,8 @@
 import urllib.request
 from bs4 import BeautifulSoup
+import csv
+
+BASE_URL = 'https://www.gismeteo.ru/diary/4565/2016/'
 
 
 def get_html(url):
@@ -7,16 +10,11 @@ def get_html(url):
     return response.read()
 
 
-def month(html):
-    soup = BeautifulSoup(html, "html.parser")
-    table = soup.find('div', class_='cover png')
-    month = table.find('h1')
-    return print(month.text[32:])
-
-
 def parse(html):
     soup = BeautifulSoup(html, "html.parser")
     table = soup.find('table')
+    date = soup.find('div', class_='cover png')
+    month = date.find('h1')
 
     journals = []
 
@@ -24,26 +22,38 @@ def parse(html):
         cols = row.find_all('td')
 
         journals.append({
-            # 'month': ,
-            'date': cols[0].text,
+            'day': cols[0].text,
+            'month': month.text[32:-8],
+            'year': month.text[-7:-3],
             'weather day': cols[1].text,
             'pressure': cols[2].text,
             'weather night': cols[6].text,
-            'pressure night': cols[7].text
+            'pressure night': cols[7].text,
+
         })
+
+    for journal in journals:
+        print(journal)
+
     return journals
 
 
-def save(journals, name):
-    with open(name, 'w') as f:
-        f.write(journals)
+def save(journals, path):
+    with open(path, 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(('Day', 'Month', 'Year', 'Weather day', 'Pressure', 'Weather night', 'Pressure night'))
+
+        for journal in journals:
+            writer.writerow((journal['day'], journal['month'], journal['year'], journal['weather day'], journal['pressure'], journal['weather night'], journal['pressure night']))
 
 
 def main():
-    for month_id in range(1, 13):
-        month(get_html('https://www.gismeteo.ru/diary/4565/2016/{}/'.format(month_id)))
-        parse(get_html('https://www.gismeteo.ru/diary/4565/2016/{}/'.format(month_id)))
+    journal = []
+    for i in range(1, 13):
+        print(BASE_URL+str(i))
+        journal.extend(parse(get_html(BASE_URL + str(i))))
 
+    save(journal, 'gismeteo.csv')
 
 
 if __name__ == '__main__':
