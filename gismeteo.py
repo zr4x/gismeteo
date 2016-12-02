@@ -33,7 +33,7 @@ def parse(html):
             'wind day': cols[5].text,
             'wind night': cols[10].text,
             'phenomena day': cols[4].find('img') is not None,
-            'phenomena night': cols[8].find('img') is not None
+            'phenomena night': cols[9].find('img') is not None
         })
 
     for journal in journals:
