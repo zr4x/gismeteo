@@ -1,8 +1,10 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import csv
+from datetime import datetime
 
-BASE_URL = 'https://www.gismeteo.ru/diary/4565/2016/'
+#BASE_URL = 'https://www.gismeteo.ru/diary/4565/2016/'
+BASE_URL_FORMAT = 'https://www.gismeteo.ru/diary/4565/{}/{}'
 
 
 def get_html(url):
@@ -17,10 +19,11 @@ def parse(html):
     month = date.find('h1')
 
     journals = []
+    weather_types = {
+    }
 
     for row in table.find_all('tr')[2:]:
         cols = row.find_all('td')
-
         journals.append({
             'day': cols[0].text,
             'month': month.text[32:-8],
@@ -48,10 +51,13 @@ def save(journals, path):
 
 
 def main():
+    current_year = datetime.now().year
     journal = []
-    for i in range(1, 13):
-        print(BASE_URL+str(i))
-        journal.extend(parse(get_html(BASE_URL + str(i))))
+    for year in range(current_year - 2, current_year + 1):
+        for i in range(1, 13):
+            url = BASE_URL_FORMAT.format(year, i)
+            print(url)
+            journal.extend(parse(get_html(url)))
 
     save(journal, 'gismeteo.csv')
 
