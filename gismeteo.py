@@ -19,8 +19,6 @@ def parse(html):
     month = date.find('h1')
 
     journals = []
-    weather_types = {
-    }
 
     for row in table.find_all('tr')[2:]:
         cols = row.find_all('td')
@@ -32,7 +30,10 @@ def parse(html):
             'pressure': cols[2].text,
             'weather night': cols[6].text,
             'pressure night': cols[7].text,
-
+            'wind day': cols[5].text,
+            'wind night': cols[10].text,
+            'phenomena day': cols[4].find('img') is not None,
+            'phenomena night': cols[8].find('img') is not None
         })
 
     for journal in journals:
@@ -44,10 +45,13 @@ def parse(html):
 def save(journals, path):
     with open(path, 'w') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(('Day', 'Month', 'Year', 'Weather day', 'Pressure', 'Weather night', 'Pressure night'))
+        writer.writerow(('Day', 'Month', 'Year', 'Weather day','Pressure', 'Wind Day', 'Phenomena Day', 'Weather Night',
+                         'Pressure Night', 'Wind Nigh', 'Phenomena Night'))
 
         for journal in journals:
-            writer.writerow((journal['day'], journal['month'], journal['year'], journal['weather day'], journal['pressure'], journal['weather night'], journal['pressure night']))
+            writer.writerow((journal['day'], journal['month'], journal['year'], journal['weather day'],
+                            journal['phenomena day'], journal['pressure'],journal['wind day'], journal['weather night'],
+                            journal['pressure night'], journal['wind night'], journal['phenomena night']))
 
 
 def main():
