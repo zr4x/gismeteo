@@ -1,6 +1,6 @@
 import urllib.request
-from bs4 import BeautifulSoup
 import csv
+from bs4 import BeautifulSoup
 from datetime import datetime
 
 #BASE_URL = 'https://www.gismeteo.ru/diary/4565/2016/'
